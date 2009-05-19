@@ -20,16 +20,22 @@
 # $Id$
 
 """
-Utilities for the Postfix Bridge
+Objects and Classes to handle operations in the Storm ORM
 """
 
-import subprocess
+from storm.locals import *
+from storm.twisted.store import *
+from storm.twisted.wrapper import *
 
-def createPassword(self, password):
-    """ Simple function that makes a system call to the dovecotpw command.
-        Returns the hashed password.
-    """
-    passwordCommand = "/usr/sbin/dovecotpw -p %s" % password
-    encPassword = subprocess.Popen(passwordCommand.split(),
-                                   stdout=subprocess.PIPE).communicate()[0]
-    return encPassword.rstrip()
+
+class Mailbox(Storm):
+    __storm_table__ = 'mailbox'
+    
+    username = Unicode(primary = True)
+    password = Unicode()
+    name = Unicode()
+    quota = Int()
+    domain = Unicode()
+    created = DateTime()
+    modified = DateTime()
+    active = Bool()
