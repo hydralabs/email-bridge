@@ -59,7 +59,32 @@ class MailboxManager():
         return d
     
     def update(self, email, password, name, quota, status):
-        q = "UPDATE "
+        
+        def gotSuccess(s):
+            return "Success"
+        
+        def gotUpdate(u):
+            return self.store.commit()
+        
+        def gotMailbox(mb):
+            
+            mb.password = unicode(dovecotpw(password))
+            mb.name = unicode(name)
+            mb.quota = quota
+            mb.status = status
+            
+            return self.store.update(mb)
+        
+        def gotError(e):
+            self.store.rollback()
+            print e
+            return "Fault"
+        
+        d = self.store.get(Mailbox, unicode(email))
+        d.addCallbacks(gotMailbox, gotError)
+        d.addCallbacks(gotUpdate, gotError)
+        d.addCallbacks(gotSuccess, gotError)
+        
     
     def delete(self, email):
         q = "DELETE * FROM `%s` WHERE `username` = %s LIMIT 1"

@@ -41,7 +41,7 @@ class MailboxGateway(xmlrpc.XMLRPC):
         return self.manager.create(email, password, name, quota, status)
 
     def xmlrpc_update(self, email, password, name, quota, status):
-        return 'Not Implemented'
+        return self.manager.update(email, password, name, quota, status)
     
     def xmlrpc_delete(self, email):
         return 'Not Implemented'
