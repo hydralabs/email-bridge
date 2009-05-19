@@ -26,34 +26,46 @@ Postfix Email XML-RPC api
 from twisted.internet import reactor, threads, ssl, defer
 from twisted.web import server, resource, static, xmlrpc
 
-from sql import SqlManager
-import util
+from storm.locals import *
+from storm.twisted.store import *
 
-sqldb = SqlManager()
+from dovecot import dovecotpw
+from api import MailboxManager
 
-class EmailGateway(xmlrpc.XMLRPC):
+
+class MailboxGateway(xmlrpc.XMLRPC):
+    
+    manager = None
     
     def xmlrpc_create(self, email, password, name, quota, status):
-        sqldb.create(email, password, name, quota, status)
-        return 'Success'
+        return self.manager.create(email, password, name, quota, status)
 
     def xmlrpc_update(self, email, password, name, quota, status):
-        #Note: This is not normal as you cannot "change" an email
-        
-        sqldb.update(email, password, name, quota, status)
-        return 'Success'
+        return 'Not Implemented'
     
     def xmlrpc_delete(self, email):
-        sqldb.delete(email)   
-        return 'Success'
+        return 'Not Implemented'
     
     def xmlrpc_disable(self, email):
-        sqldb.disable(email)
-        return 'Success'
+        return 'Not Implemented'
     
     def xmlrpc_enable(self, email):
-        sqldb.enable(email)
-        return 'Success'
+        return 'Not Implemented'
 
+database = create_database("mysql://user:pass@host/database")
 
-site = server.Site(EmailGateway())
+store = DeferredStore(database)
+d = store.start()
+
+def goterr(e):
+    print "Db error"
+    
+def gotstore(s):
+    print "got db"
+    
+d.addCallbacks(gotstore, goterr)
+
+gw = MailboxGateway()
+gw.manager = MailboxManager(store)
+
+site = server.Site(gw)

@@ -20,29 +20,43 @@
 # $Id$
 
 """
-MySQL mappings for the integration with Postfix
+Postfix Manager API for Python
 """
 
-from twisted.enterprise.adbapi import ConnectionPool
+from orm import Mailbox
+from dovecot import dovecotpw
 
-class SqlManager():
+class MailboxManager():
+    """
+    Generic API for managing Mailboxes in Postfix
+    """
     
-    def __init__(self):
-        
-        self.table = 'mailbox'
-    
-        self.db = ConnectionPool(
-            "MySQLdb",
-            cp_reconnect=True,
-            host="server_ip",
-            user="username",
-            passwd="password",
-            db="db_name",
-            cp_noisy = True
-        )
+    def __init__(self, store):
+        self.store = store
     
     def create(self, email, password, name, quota, status):
-        q = "INSERT OR UPDATE"
+        
+        def gotSuccess(s):
+            return "Success"
+        
+        def gotResult(r):
+            return self.store.commit()
+        
+        def gotError(f):
+            self.store.rollback()
+            return "Fault"
+        
+        mb = Mailbox()
+        mb.username = unicode(email)
+        mb.password = unicode(dovecotpw(password))
+        mb.name = unicode(name)
+        mb.quota = quota
+        mb.status = status
+        
+        d = self.store.add(mb)
+        d.addCallbacks(gotResult, gotError)
+        d.addCallbacks(gotSuccess, gotError)
+        return d
     
     def update(self, email, password, name, quota, status):
         q = "UPDATE "
@@ -57,5 +71,4 @@ class SqlManager():
         
     def enable(self, email):
         q = "UPDATE `%s` SET `active` = %s WHERE `username` = '%s' LIMIT 1"
-        db.runQuery(q, db_table, 1, email)
-    
+        db.runQuery(q, db_table, 1, email)    
