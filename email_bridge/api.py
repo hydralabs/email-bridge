@@ -63,9 +63,6 @@ class MailboxManager():
         def gotSuccess(s):
             return "Success"
         
-        def gotUpdate(u):
-            return self.store.commit()
-        
         def gotMailbox(mb):
             
             mb.password = unicode(dovecotpw(password))
@@ -73,7 +70,7 @@ class MailboxManager():
             mb.quota = quota
             mb.status = status
             
-            return self.store.update(mb)
+            return self.store.commit()
         
         def gotError(e):
             self.store.rollback()
@@ -82,7 +79,6 @@ class MailboxManager():
         
         d = self.store.get(Mailbox, unicode(email))
         d.addCallbacks(gotMailbox, gotError)
-        d.addCallbacks(gotUpdate, gotError)
         d.addCallbacks(gotSuccess, gotError)
         
     
