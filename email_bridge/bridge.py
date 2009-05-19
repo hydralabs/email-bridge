@@ -47,10 +47,10 @@ class MailboxGateway(xmlrpc.XMLRPC):
         return 'Not Implemented'
     
     def xmlrpc_disable(self, email):
-        return 'Not Implemented'
+        return self.disable.update(email)
     
     def xmlrpc_enable(self, email):
-        return 'Not Implemented'
+        return self.manager.enable(email)
 
 database = create_database("mysql://user:pass@host/database")
 

@@ -80,6 +80,7 @@ class MailboxManager():
         d = self.store.get(Mailbox, unicode(email))
         d.addCallbacks(gotMailbox, gotError)
         d.addCallbacks(gotSuccess, gotError)
+        return d
         
     
     def delete(self, email):
@@ -87,9 +88,43 @@ class MailboxManager():
         print q
         
     def disable(self, email):
-        q = "UPDATE `%s` SET `active` = %s WHERE `username` = '%s' LIMIT 1"
-        db.runQuery(q, db_table, 0, email)
+        
+        def gotSuccess(s):
+            return "Success"
+        
+        def gotMailbox(mb):
+            
+            mb.status = False
+            
+            return self.store.commit()
+        
+        def gotError(e):
+            self.store.rollback()
+            print e
+            return "Fault"
+        
+        d = self.store.get(Mailbox, unicode(email))
+        d.addCallbacks(gotMailbox, gotError)
+        d.addCallbacks(gotSuccess, gotError)
+        return d
         
     def enable(self, email):
-        q = "UPDATE `%s` SET `active` = %s WHERE `username` = '%s' LIMIT 1"
-        db.runQuery(q, db_table, 1, email)    
+        
+        def gotSuccess(s):
+            return "Success"
+        
+        def gotMailbox(mb):
+            
+            mb.status = True
+            
+            return self.store.commit()
+        
+        def gotError(e):
+            self.store.rollback()
+            print e
+            return "Fault"
+        
+        d = self.store.get(Mailbox, unicode(email))
+        d.addCallbacks(gotMailbox, gotError)
+        d.addCallbacks(gotSuccess, gotError)
+        return d
