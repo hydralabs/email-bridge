@@ -53,6 +53,7 @@ class MailboxManager():
         mb.password = unicode(dovecotpw(password))
         mb.name = unicode(name)
         mb.quota = quota
+        mb.domain = unicode(email.split('@')[1])
         mb.created = datetime.datetime.now()
         mb.modified = datetime.datetime.now()
         mb.active = active
