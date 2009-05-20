@@ -23,6 +23,8 @@
 Postfix Manager API for Python
 """
 
+import datetime
+
 from orm import Mailbox
 from dovecot import dovecotpw
 
@@ -51,6 +53,8 @@ class MailboxManager():
         mb.password = unicode(dovecotpw(password))
         mb.name = unicode(name)
         mb.quota = quota
+        mb.created = datetime.datetime.now()
+        mb.modified = datetime.datetime.now()
         mb.status = status
         
         d = self.store.add(mb)
@@ -68,6 +72,7 @@ class MailboxManager():
             mb.password = unicode(dovecotpw(password))
             mb.name = unicode(name)
             mb.quota = quota
+            mb.modified = datetime.datetime.now()
             mb.status = status
             
             return self.store.commit()
@@ -94,6 +99,7 @@ class MailboxManager():
         
         def gotMailbox(mb):
             
+            mb.modified = datetime.datetime.now()
             mb.status = False
             
             return self.store.commit()
@@ -115,6 +121,7 @@ class MailboxManager():
         
         def gotMailbox(mb):
             
+            mb.modified = datetime.datetime.now()
             mb.status = True
             
             return self.store.commit()
