@@ -47,7 +47,7 @@ class MailboxGateway(xmlrpc.XMLRPC):
         return 'Not Implemented'
     
     def xmlrpc_disable(self, email):
-        return self.disable.update(email)
+        return self.manager.disable(email)
     
     def xmlrpc_enable(self, email):
         return self.manager.enable(email)
