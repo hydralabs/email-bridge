@@ -36,7 +36,7 @@ class MailboxManager():
     def __init__(self, store):
         self.store = store
     
-    def create(self, email, password, name, quota, status):
+    def create(self, email, password, name, quota, active):
         
         def gotSuccess(s):
             return "Success"
@@ -55,14 +55,14 @@ class MailboxManager():
         mb.quota = quota
         mb.created = datetime.datetime.now()
         mb.modified = datetime.datetime.now()
-        mb.status = status
+        mb.active = active
         
         d = self.store.add(mb)
         d.addCallbacks(gotResult, gotError)
         d.addCallbacks(gotSuccess, gotError)
         return d
     
-    def update(self, email, password, name, quota, status):
+    def update(self, email, password, name, quota, active):
         
         def gotSuccess(s):
             return "Success"
@@ -73,7 +73,7 @@ class MailboxManager():
             mb.name = unicode(name)
             mb.quota = quota
             mb.modified = datetime.datetime.now()
-            mb.status = status
+            mb.active = active
             
             return self.store.commit()
         
@@ -100,7 +100,7 @@ class MailboxManager():
         def gotMailbox(mb):
             
             mb.modified = datetime.datetime.now()
-            mb.status = False
+            mb.active = False
             
             return self.store.commit()
         
@@ -122,7 +122,7 @@ class MailboxManager():
         def gotMailbox(mb):
             
             mb.modified = datetime.datetime.now()
-            mb.status = True
+            mb.active = True
             
             return self.store.commit()
         

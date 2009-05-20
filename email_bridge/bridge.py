@@ -37,11 +37,11 @@ class MailboxGateway(xmlrpc.XMLRPC):
     
     manager = None
     
-    def xmlrpc_create(self, email, password, name, quota, status):
-        return self.manager.create(email, password, name, quota, status)
+    def xmlrpc_create(self, email, password, name, quota, active):
+        return self.manager.create(email, password, name, quota, active)
 
-    def xmlrpc_update(self, email, password, name, quota, status):
-        return self.manager.update(email, password, name, quota, status)
+    def xmlrpc_update(self, email, password, name, quota, active):
+        return self.manager.update(email, password, name, quota, active)
     
     def xmlrpc_delete(self, email):
         return 'Not Implemented'
@@ -58,7 +58,7 @@ store = DeferredStore(database)
 d = store.start()
 
 def goterr(e):
-    print "Db error"
+    print "db error"
     
 def gotstore(s):
     print "got db"
