@@ -52,20 +52,23 @@ class MailboxGateway(xmlrpc.XMLRPC):
     def xmlrpc_enable(self, email):
         return self.manager.enable(email)
 
-database = create_database("mysql://user:pass@host/database")
-
-store = DeferredStore(database)
-d = store.start()
 
 def goterr(e):
     print "db error"
-    
+
 def gotstore(s):
     print "got db"
-    
-d.addCallbacks(gotstore, goterr)
 
 gw = MailboxGateway()
-gw.manager = MailboxManager(store)
+
+def initialize():
+
+    database = create_database("mysql://user:pass@host/database")
+    store = DeferredStore(database)
+    d = store.start()
+
+    d.addCallbacks(gotstore, goterr)
+    gw.manager = MailboxManager(store)
 
 site = server.Site(gw)
+reactor.callWhenRunning(initialize)
